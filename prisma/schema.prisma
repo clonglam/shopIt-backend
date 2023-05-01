@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Collection {
+  id          Int       @id @default(autoincrement())
+  title       String
+  slug        String
+  description String
+  thumbnail   String
+  products    Product[]
+
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  customerId    Int
+  paymentStatus PaymentStatus
+  User          User          @relation(fields: [customerId], references: [id])
+  OrderItem     OrderItem[]
+}
+
+model OrderItem {
+  quantity  Int
+  orderId   Int
+  userId    Int
+  unitPrice Int
+  Order     Order @relation(fields: [orderId], references: [id])
+  User      User  @relation(fields: [userId], references: [id])
+
+  @@id([userId, orderId])
+  @@index([userId, orderId])
+}
+
+model Inventory {
+  id        Int       @id @default(autoincrement())
+  quantity  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  productId Int     @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  title       String
+  slug        String
+  description String
+  price       Int
+  SKU         String
+  gallery     String[]
+  hoverImage  String?
+  thumbnail   String?
+  inventory   Inventory?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  collections Collection[]
+}
+
+model Profile {
+  id     Int    @id @default(autoincrement())
+  bio    String
+  userId Int    @unique
+  User   User   @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  role      Role        @default(USER)
+  firstName String
+  lastName  String
+  Order     Order[]
+  OrderItem OrderItem[]
+  Profile   Profile?
+}
+
+enum PaymentStatus {
+  PENDING
+  FAILED
+  COMPLETED
+}
+
+enum Role {
+  USER
+  ADMIN
+}
