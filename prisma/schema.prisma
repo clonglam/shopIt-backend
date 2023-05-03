@@ -10,7 +10,7 @@ datasource db {
 model Collection {
   id          Int       @id @default(autoincrement())
   title       String
-  slug        String
+  slug        String    @unique
   description String
   thumbnail   String
   products    Product[]
@@ -54,7 +54,7 @@ model Inventory {
 model Product {
   id          Int        @id @default(autoincrement())
   title       String
-  slug        String
+  slug        String     @unique
   description String
   price       Int
   SKU         String

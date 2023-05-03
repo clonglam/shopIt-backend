@@ -18,7 +18,7 @@ import validateResource from "../middleware/validateResource"
 
 const router = express.Router()
 
-router.get("/:productId", validateResource(getProductSchema), getProductHandler)
+router.get("/:productId", getProductHandler)
 
 router.get("/", validateResource(listProductsSchema), listProductsHandler)
 

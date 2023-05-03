@@ -49,16 +49,15 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
     const metricsLabels = {
         operation: "Get Product",
     }
-
-    const data = {
-        id: parseInt(productId),
-    }
+    console.log("productId", productId)
 
     const timer = databaseResponseTimeHistogram.startTimer()
 
     try {
-        const product = await prisma.product.findUnique({
-            where: data,
+        const product = await prisma.product.findFirst({
+            where: {
+                slug: productId,
+            },
             include: { collections: true, inventory: true },
         })
 
@@ -74,6 +73,8 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
 export async function listProucts({ query }: ListProductsInput) {
     console.log("query", query)
 
+    const { collections } = query
+
     const metricsLabels = {
         operation: "Get Products",
     }
@@ -82,6 +83,15 @@ export async function listProucts({ query }: ListProductsInput) {
 
     try {
         const result = await prisma.product.findMany({
+            where: {
+                collections: {
+                    some: {
+                        slug: {
+                            equals: collections,
+                        },
+                    },
+                },
+            },
             include: { collections: true, inventory: true },
         })
         timer({ ...metricsLabels, success: "true" })

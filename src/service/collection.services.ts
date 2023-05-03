@@ -69,11 +69,9 @@ export async function listCollections({ query }: GetCollectionsInput) {
 
     try {
         const result = await prisma.collection.findMany({
-            orderBy: [
-                {
-                    id: "asc",
-                },
-            ],
+            orderBy: {
+                id: "asc",
+            },
         })
         timer({ ...metricsLabels, success: "true" })
         return result

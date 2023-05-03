@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client"
 import * as z from "zod"
 
 const payload = {
@@ -12,7 +13,7 @@ const payload = {
         thumbnail: z.string({
             required_error: "Thumbnail is required",
         }),
-    }),
+    }) satisfies z.ZodType<Prisma.CollectionCreateInput>,
 }
 
 const params = {

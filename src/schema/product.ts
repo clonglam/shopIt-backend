@@ -35,6 +35,7 @@ const params = {
 const query = {
     query: z.object({
         page: z.optional(z.number({})),
+        collections: z.string().optional(),
     }),
 }
 
