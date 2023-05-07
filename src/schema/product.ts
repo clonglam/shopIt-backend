@@ -20,6 +20,7 @@ const productBody = z.object({
     hoverImage: z.string().optional(),
     collectionIds: z.array(z.number()).optional(),
 })
+
 const payload = {
     body: productBody,
 }

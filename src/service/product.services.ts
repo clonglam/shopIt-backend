@@ -71,9 +71,11 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
 }
 
 export async function listProucts({ query }: ListProductsInput) {
-    console.log("query", query)
+    // console.log("query", query)
 
     const { collections } = query
+
+    console.log("query", query)
 
     const metricsLabels = {
         operation: "Get Products",

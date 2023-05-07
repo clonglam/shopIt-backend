@@ -1,19 +1,9 @@
 import { Prisma } from "@prisma/client"
-import {
-    createUser,
-    deleteUser,
-    getUser,
-    updateUser,
-} from "../services/user.service"
-import {
-    CreateUserInput,
-    DeleteUserInput,
-    GetUserInput,
-    UpdateUserInput,
-} from "./../schema/users"
+
 import { Request, Response } from "express"
 import validateResource from "../middleware/validateResource"
-import { getCourseEnrollmentSchema } from "../schema/courseEnrollment"
+import { CreateUserInput } from "../schema/user"
+import { createUser } from "../service/user.services"
 
 export async function createUserHandler(
     req: Request<{}, {}, CreateUserInput["body"]>,
@@ -37,45 +27,45 @@ export async function createUserHandler(
     }
 }
 
-export async function getUserHandler(
-    req: Request<GetUserInput["params"], {}, {}>,
-    res: Response
-) {
-    const user = await getUser(req.params)
+// export async function getUserHandler(
+//     req: Request<GetUserInput["params"], {}, {}>,
+//     res: Response
+// ) {
+//     const user = await getUser(req.params)
 
-    if (!user) return res.sendStatus(404)
+//     if (!user) return res.sendStatus(404)
 
-    return res.send(user)
-}
+//     return res.send(user)
+// }
 
-export async function updateUserHandler(
-    req: Request<UpdateUserInput["params"], {}, UpdateUserInput["body"]>,
-    res: Response
-) {
-    const update = req.body
+// export async function updateUserHandler(
+//     req: Request<UpdateUserInput["params"], {}, UpdateUserInput["body"]>,
+//     res: Response
+// ) {
+//     const update = req.body
 
-    const user = await getUser(req.params)
+//     const user = await getUser(req.params)
 
-    if (!user) {
-        return res.sendStatus(404)
-    }
+//     if (!user) {
+//         return res.sendStatus(404)
+//     }
 
-    const updatedProduct = await updateUser(req.params, update)
+//     const updatedProduct = await updateUser(req.params, update)
 
-    return res.send(updatedProduct)
-}
+//     return res.send(updatedProduct)
+// }
 
-export async function deleteUserHandler(
-    req: Request<DeleteUserInput["params"], {}, {}>,
-    res: Response
-) {
-    const user = await getUser(req.params)
+// export async function deleteUserHandler(
+//     req: Request<DeleteUserInput["params"], {}, {}>,
+//     res: Response
+// ) {
+//     const user = await getUser(req.params)
 
-    if (!user) {
-        return res.sendStatus(404)
-    }
+//     if (!user) {
+//         return res.sendStatus(404)
+//     }
 
-    const deletedUser = await deleteUser(req.params)
+//     const deletedUser = await deleteUser(req.params)
 
-    return res.send(deletedUser)
-}
+//     return res.send(deletedUser)
+// }

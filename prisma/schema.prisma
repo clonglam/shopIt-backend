@@ -22,9 +22,9 @@ model Order {
   id            Int           @id @default(autoincrement())
   createdAt     DateTime      @default(now())
   updatedAt     DateTime
-  customerId    Int
+  user          User          @relation(fields: [userId], references: [id])
+  userId        Int
   paymentStatus PaymentStatus
-  User          User          @relation(fields: [customerId], references: [id])
   OrderItem     OrderItem[]
 }
 
@@ -68,6 +68,7 @@ model Product {
   deletedAt DateTime?
 
   collections Collection[]
+  CartItem    CartItem[]
 }
 
 model Profile {
@@ -75,17 +76,6 @@ model Profile {
   bio    String
   userId Int    @unique
   User   User   @relation(fields: [userId], references: [id])
-}
-
-model User {
-  id        Int         @id @default(autoincrement())
-  email     String      @unique
-  role      Role        @default(USER)
-  firstName String
-  lastName  String
-  Order     Order[]
-  OrderItem OrderItem[]
-  Profile   Profile?
 }
 
 enum PaymentStatus {
@@ -97,4 +87,72 @@ enum PaymentStatus {
 enum Role {
   USER
   ADMIN
+}
+
+model Cart {
+  id     Int        @id @default(autoincrement())
+  user   User       @relation(fields: [userId], references: [id])
+  userId Int        @unique
+  items  CartItem[]
+}
+
+model CartItem {
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+  cartId    Int
+  productId Int
+  quantity  Int
+
+  @@id([cartId, productId])
+  @@index([cartId, productId])
+}
+
+model Address {
+  id         Int    @id @default(autoincrement())
+  street     String
+  city       String
+  state      String
+  country    String
+  postalCode String
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  password  String
+  role      Role        @default(USER)
+  name      String
+  order     Order[]
+  cart      Cart?
+  orderItem OrderItem[]
+  profile   Profile?
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  OAuthToken OAuthToken[]
+}
+
+model OAuthProvider {
+  id           Int          @id @default(autoincrement())
+  name         String       @unique
+  clientId     String
+  clientSecret String
+  authUrl      String
+  tokenUrl     String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  OAuthToken   OAuthToken[]
+}
+
+model OAuthToken {
+  id           Int           @id @default(autoincrement())
+  accessToken  String
+  refreshToken String
+  expiresIn    Int
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  provider     OAuthProvider @relation(fields: [providerId], references: [id])
+  providerId   Int
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
