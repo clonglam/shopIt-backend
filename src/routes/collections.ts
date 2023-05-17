@@ -3,6 +3,7 @@ import {
     createCollectionHandler,
     deleteCollectionHandler,
     getCollectionHandler,
+    getCollectionProductsHandler,
     getCollectionsHandler,
     updateCollectionHandler,
 } from "../controller/collection.controller"
@@ -24,7 +25,7 @@ router.get(
 router.get(
     "/:collectionId/products",
     validateResource(getCollectionSchema),
-    getCollectionHandler
+    getCollectionProductsHandler
 )
 
 router.get("/", validateResource(getCollectionsSchema), getCollectionsHandler)

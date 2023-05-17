@@ -61,7 +61,6 @@ export const updateProductSchema = z.object({
 
 export const deleteProductSchema = z.object({
     ...params,
-    ...payload,
 })
 
 export type GetProductInput = z.TypeOf<typeof getProductSchema>

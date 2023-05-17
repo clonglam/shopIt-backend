@@ -159,7 +159,7 @@ export async function deleteProduct({
     const timer = databaseResponseTimeHistogram.startTimer()
 
     try {
-        const result = await prisma.product.findFirst({
+        const result = await prisma.product.delete({
             where: { ...data },
         })
 
