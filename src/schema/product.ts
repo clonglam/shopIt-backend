@@ -14,7 +14,9 @@ const productBody = z.object({
     price: z.number({
         required_error: "Price is required.",
     }),
-    quantity: z.number(),
+    inventory: z.number({
+        required_error: "inventory is required.",
+    }),
     gallery: z.array(z.string()).optional(),
     thumbnail: z.string().optional(),
     hoverImage: z.string().optional(),

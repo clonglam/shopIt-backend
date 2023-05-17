@@ -13,7 +13,7 @@ import {
     listProucts,
     updateProduct,
 } from "../service/product.services"
-import { Collection, Inventory, Product } from "@prisma/client"
+import { Collection, Product } from "@prisma/client"
 
 export async function createProductHandler(
     req: Request<{}, {}, CreateProductInput["body"]>,
@@ -32,6 +32,8 @@ export async function listProductsHandler(
     res: Response
 ) {
     try {
+        // if(req)
+        console.log("req", req.param)
         const moives = await listProucts(req)
         return res.send(moives)
     } catch (err) {
@@ -41,13 +43,7 @@ export async function listProductsHandler(
 
 export async function getProductHandler(
     req: Request<GetProductInput["params"], {}, {}>,
-    res: Response<
-        | (Product & {
-              inventory: Inventory | null
-              collections: Collection[]
-          })
-        | null
-    >
+    res: Response<Product | null>
 ) {
     try {
         const product = await getProduct(req.params)

@@ -27,23 +27,21 @@ async function main() {
                 "https://cdn.shopify.com/s/files/1/1087/6904/products/air-sideboard-low-617050_large.jpg?v=1678825239",
             hoverImage:
                 "https://cdn.shopify.com/s/files/1/1087/6904/products/air-sideboard-low-824028_1400x.jpg?v=1678744396",
-            inventory: {
+            inventory: 6,
+            collectionsOnProducts: {
                 create: {
-                    quantity: 6,
-                },
-            },
-            collections: {
-                create: [
-                    {
-                        title: "Furniture",
-                        slug: "funiture",
-                        description: `
-                                <p>Discover the meaning of Scandinavian furniture with HORNE’s stunning gallery of modern designs intended to elevate your home, studio, or workspace. These sleek and chic examples of minimalist furniture design create and conserve space by offering calming, flowing linework and construction coupled with a gorgeous palette of earth tones, natural wood, and metalwork.</p> 
-                                <p>Find minimalist desk accessories and add a touch of sparing interest to any surface or countertop. From unique items like the Offset Stool to modern updates of traditional pieces like coffee tables, HORNE offers shoppers the chance to rethink entire rooms with signature pieces and thoughtful accents.</p>`,
-                        thumbnail:
-                            "cdn.shopify.com/s/files/1/1087/6904/collections/furniture-933394_2000x.png?v=1678748359",
+                    collection: {
+                        create: {
+                            title: "Lighting",
+                            slug: "lighting",
+                            description: `
+                            Transform the way your ceilings and rooms are illuminated with modern ceiling light options from HORNE. This highly curated gallery of ceiling light fixtures will brighten, embolden, and maximize your space with a touch of modernity and minimalism. As homeowners and designers know, the right ceiling light can usher in a completely new atmosphere into a room, so finding the one that brings the most out of your space is crucial. HORNE offers designs for contemporary ceiling lighting that span a world of inspiration, from pieces like the daring and unique 2 Arm Mobile Light to updated takes on traditional options. No matter how far you’re wanting to take your modern ceiling lights, this collection is full of answers for every space and home. Elevate your room, studio, or workspace with a minimalist ceiling light from HORNE.
+                            `,
+                            thumbnail:
+                                "cdn.shopify.com/s/files/1/1087/6904/collections/ceiling-lights-279305_2000x.png?v=1678747938",
+                        },
                     },
-                ],
+                },
             },
         },
     })
@@ -65,24 +63,7 @@ async function main() {
                 "https://cdn.shopify.com/s/files/1/1087/6904/products/bell-pendant-717449_1400x.jpg?v=1678745777",
             hoverImage:
                 "https://cdn.shopify.com/s/files/1/1087/6904/products/bell-pendant-573200_1400x.jpg?v=1678745777",
-            inventory: {
-                create: {
-                    quantity: 300,
-                },
-            },
-            collections: {
-                create: [
-                    {
-                        title: "Lighting",
-                        slug: "lighting",
-                        description: `
-Transform the way your ceilings and rooms are illuminated with modern ceiling light options from HORNE. This highly curated gallery of ceiling light fixtures will brighten, embolden, and maximize your space with a touch of modernity and minimalism. As homeowners and designers know, the right ceiling light can usher in a completely new atmosphere into a room, so finding the one that brings the most out of your space is crucial. HORNE offers designs for contemporary ceiling lighting that span a world of inspiration, from pieces like the daring and unique 2 Arm Mobile Light to updated takes on traditional options. No matter how far you’re wanting to take your modern ceiling lights, this collection is full of answers for every space and home. Elevate your room, studio, or workspace with a minimalist ceiling light from HORNE.
-                        `,
-                        thumbnail:
-                            "cdn.shopify.com/s/files/1/1087/6904/collections/ceiling-lights-279305_2000x.png?v=1678747938",
-                    },
-                ],
-            },
+            inventory: 300,
         },
     })
 

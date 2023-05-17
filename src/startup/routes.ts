@@ -8,6 +8,8 @@ import collections from "../routes/collections"
 import products from "../routes/products"
 import cart from "../routes/cart"
 import auth from "../routes/auth"
+import user from "../routes/user"
+import checkout from "../routes/checkout"
 
 export default function (app: Express, port: number) {
     app.use(express.json())
@@ -19,6 +21,8 @@ export default function (app: Express, port: number) {
     app.use("/api/collections", collections)
     app.use("/api/products", products)
     app.use("/api/cart", cart)
+    app.use("/api/user", user)
+    app.use("/api/payment", checkout)
 
     swaggerDocs(app, port)
 }

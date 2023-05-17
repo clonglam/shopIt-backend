@@ -21,6 +21,11 @@ router.get(
     validateResource(getCollectionSchema),
     getCollectionHandler
 )
+router.get(
+    "/:collectionId/products",
+    validateResource(getCollectionSchema),
+    getCollectionHandler
+)
 
 router.get("/", validateResource(getCollectionsSchema), getCollectionsHandler)
 

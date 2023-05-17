@@ -5,7 +5,7 @@ import {
     UpdateCollectionInput,
 } from "../schema/collection"
 import { Request, Response } from "express"
-import { Collection } from "@prisma/client"
+import { Collection, Product } from "@prisma/client"
 import { GetCollectionInput } from "../schema/collection"
 import {
     createCollection,
@@ -13,6 +13,7 @@ import {
     getCollection,
     listCollections,
     updateCollection,
+    getCollectionProducts,
 } from "../service/collection.services"
 
 export async function createCollectionHandler(
@@ -46,6 +47,17 @@ export async function getCollectionHandler(
     try {
         const collection = await getCollection(req.params)
         return res.send(collection)
+    } catch (err) {
+        return res.sendStatus(400)
+    }
+}
+export async function getCollectionProductsHandler(
+    req: Request<GetCollectionInput["params"], {}, {}>,
+    res: Response<Product[] | null | undefined>
+) {
+    try {
+        const products = await getCollectionProducts(req.params)
+        return res.send(products)
     } catch (err) {
         return res.sendStatus(400)
     }

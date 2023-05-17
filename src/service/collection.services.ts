@@ -58,6 +58,35 @@ export async function getCollection({
     }
 }
 
+export async function getCollectionProducts({
+    collectionId,
+}: GetCollectionInput["params"]) {
+    const metricsLabels = {
+        operation: "Get Collection",
+    }
+
+    const data = {
+        id: parseInt(collectionId),
+    }
+
+    const timer = databaseResponseTimeHistogram.startTimer()
+
+    try {
+        const collection = await prisma.collection.findUnique({
+            where: data,
+
+            include: { products: { include: { product: true } } },
+        })
+
+        timer({ ...metricsLabels, success: "true" })
+
+        return collection?.products.map(({ product }) => product)
+    } catch (e) {
+        timer({ ...metricsLabels, success: "false" })
+        throw e
+    }
+}
+
 export async function listCollections({ query }: GetCollectionsInput) {
     console.log("query", query)
 

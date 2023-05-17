@@ -11,6 +11,7 @@ import {
     createCart,
     deleteCart,
     getCartById,
+    getCartByUserId,
     updateCart,
 } from "../service/cart.services"
 
@@ -77,6 +78,18 @@ export async function deleteCartHandler(
     try {
         const cart = await deleteCart(req.params)
         return res.send(cart)
+    } catch (err) {
+        return res.sendStatus(400)
+    }
+}
+
+export async function getCartByUserIdHandler(
+    { params }: Request<{ userId: string }, {}, {}>,
+    res: Response
+) {
+    try {
+        const carts = await getCartByUserId({ userId: params.userId })
+        return res.send(carts)
     } catch (err) {
         return res.sendStatus(400)
     }

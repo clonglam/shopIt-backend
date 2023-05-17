@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A simple todo backend using Prisma, Express, TypeScript, and PostgreSQL",
   "main": "build/src/server.js",
+  "proxy":"127.0.0.1:8000",
   "scripts": {
     "compile": "tsc && node build/src/index.js",
     "dev": "DEBUG=app:* nodemon",
@@ -90,10 +91,12 @@
     "pino": "^8.11.0",
     "prisma": "^4.13.0",
     "prom-client": "^14.2.0",
+    "stripe": "^12.4.0",
     "supertest": "^6.3.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.2",
     "ts-jest": "^29.1.0",
     "zod": "^3.21.4"
   }
+
 }

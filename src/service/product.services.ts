@@ -11,7 +11,8 @@ import { databaseResponseTimeHistogram } from "../utils/metrics"
 const prisma = new PrismaClient()
 
 export async function createProduct(input: CreateProductInput["body"]) {
-    const { collectionIds, quantity, ...rest } = input
+    console.log("REqBody", input)
+    const { collectionIds, ...rest } = input
     const metricsLabels = {
         operation: "Create Product",
     }
@@ -30,17 +31,23 @@ export async function createProduct(input: CreateProductInput["body"]) {
         const result = await prisma.product.create({
             data: {
                 ...rest,
-                collections: {
-                    connect: collectionIds.map(collectionId => {
-                        return { id: collectionId }
-                    }),
+                collectionsOnProducts: {
+                    createMany: {
+                        data: collectionIds.map(collectionId => {
+                            return {
+                                collectionId,
+                            }
+                        }),
+                    },
                 },
             },
         })
         timer({ ...metricsLabels, success: "true" })
+
         return result
     } catch (e) {
         timer({ ...metricsLabels, success: "false" })
+        console.log("error", e)
         throw e
     }
 }
@@ -58,7 +65,11 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
             where: {
                 slug: productId,
             },
-            include: { collections: true, inventory: true },
+            include: {
+                collectionsOnProducts: {
+                    include: { collection: true },
+                },
+            },
         })
 
         timer({ ...metricsLabels, success: "true" })
@@ -70,7 +81,30 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
     }
 }
 
-export async function listProucts({ query }: ListProductsInput) {
+export async function listProucts({}: ListProductsInput) {
+    const metricsLabels = {
+        operation: "Get Products",
+    }
+
+    const timer = databaseResponseTimeHistogram.startTimer()
+
+    try {
+        const result = await prisma.product.findMany({
+            orderBy: {
+                id: "asc",
+            },
+        })
+        timer({ ...metricsLabels, success: "true" })
+        return result
+    } catch (e) {
+        timer({ ...metricsLabels, success: "false" })
+        throw e
+    }
+}
+
+export async function listProuctsFilterWithCollection({
+    query,
+}: ListProductsInput) {
     // console.log("query", query)
 
     const { collections } = query
@@ -84,20 +118,27 @@ export async function listProucts({ query }: ListProductsInput) {
     const timer = databaseResponseTimeHistogram.startTimer()
 
     try {
-        const result = await prisma.product.findMany({
+        const collection = await prisma.collection.findUnique({
             where: {
-                collections: {
-                    some: {
-                        slug: {
-                            equals: collections,
-                        },
+                slug: collections,
+            },
+            select: {
+                id: true,
+            },
+        })
+
+        if (collection) {
+            const collectionId = collection.id
+            const result = await prisma.product.findMany({
+                where: {
+                    collectionsOnProducts: {
+                        some: { collectionId: collectionId },
                     },
                 },
-            },
-            include: { collections: true, inventory: true },
-        })
-        timer({ ...metricsLabels, success: "true" })
-        return result
+            })
+            timer({ ...metricsLabels, success: "true" })
+            return result
+        } else throw new Error("No collection found.")
     } catch (e) {
         timer({ ...metricsLabels, success: "false" })
         throw e
@@ -141,7 +182,7 @@ export async function updateProduct(
     }
 
     const id = parseInt(productId)
-    const { collectionIds, quantity, ...rest } = body
+    const { collectionIds, ...rest } = body
 
     const timer = databaseResponseTimeHistogram.startTimer()
 
@@ -150,11 +191,20 @@ export async function updateProduct(
             where: { id },
             data: {
                 ...rest,
-                inventory: { update: { quantity } },
-                collections: {
-                    connect: collectionIds?.map(collectionId => {
-                        return { id: collectionId }
-                    }),
+                collectionsOnProducts: {
+                    deleteMany: {},
+
+                    createMany: {
+                        data:
+                            collectionIds?.map(collectionId => {
+                                return {
+                                    collectionId: collectionId,
+                                    // collection: {
+                                    //     connect: { id: collectionId },
+                                    // },
+                                }
+                            }) || [],
+                    },
                 },
             },
         })

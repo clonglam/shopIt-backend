@@ -63,29 +63,35 @@ export async function getCartById({ cartId }: GetCartInput["params"]) {
     }
 }
 
-// export async function getCartByUserId({ userId }: { userId: string }) {
-//     const metricsLabels = {
-//         operation: "Get Cart By UserId",
-//     }
+export async function getCartByUserId({ userId }: { userId: string }) {
+    const metricsLabels = {
+        operation: "Get Cart By UserId",
+    }
 
-//     const timer = databaseResponseTimeHistogram.startTimer()
+    const timer = databaseResponseTimeHistogram.startTimer()
 
-//     try {
-//         const cart = await prisma.cart.findUnique({
-//             where: {
-//                 userId: parseInt(userId),
-//             },
-//             include: { items: true },
-//         })
+    try {
+        const cart = await prisma.cart.findUnique({
+            where: {
+                userId: parseInt(userId),
+            },
+            include: {
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        })
 
-//         timer({ ...metricsLabels, success: "true" })
+        timer({ ...metricsLabels, success: "true" })
 
-//         return cart
-//     } catch (e) {
-//         timer({ ...metricsLabels, success: "false" })
-//         throw e
-//     }
-// }
+        return cart
+    } catch (e) {
+        timer({ ...metricsLabels, success: "false" })
+        throw e
+    }
+}
 
 // export async function listProucts({ query }: ListCartsInput) {
 //     console.log("query", query)

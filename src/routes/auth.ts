@@ -11,6 +11,7 @@ router.post(
     "/login",
     passport.authenticate("local"),
     async function (req, res, next) {
+        // res.send(req.user)
         res.send({ user: _.pick(req.user, "name", "email", "role") })
     }
 )

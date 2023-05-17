@@ -12,6 +12,7 @@ const app = express()
 
 console.log(config.get("name"))
 const port = Number(process.env.PORT) || 6000
+const stripe = require("stripe")("sk_test_Hrs6SAopgFPF0bZXSN3f6ELN")
 
 app.use(helmet())
 app.use(express.static("public"))
