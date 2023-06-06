@@ -10,7 +10,7 @@
   "scripts": {
     "compile": "tsc && node build/src/index.js",
     "dev": "DEBUG=app:* nodemon",
-  "start": "node build/index.js",
+  "start": "node build/src/index.js",
   "build": "tsc",
   "postinstall": "npm run build",
     "test": "vitest --coverage"
