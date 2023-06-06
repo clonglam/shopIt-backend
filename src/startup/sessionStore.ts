@@ -8,9 +8,7 @@ export default function (app: Express) {
     if (!process.env.REDISCLOUD_URL)
         throw new Error("There is no Resiscroud URL")
 
-    let redisClient = createClient({
-        socket: { host: process.env.REDISCLOUD_URL },
-    })
+    let redisClient = createClient({ url: process.env.REDISCLOUD_URL })
     redisClient.connect().catch(console.error)
 
     app.set("trust proxy", 1)
