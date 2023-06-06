@@ -4,13 +4,14 @@
   "description": "A simple todo backend using Prisma, Express, TypeScript, and PostgreSQL",
   "main": "build/src/server.js",
   "proxy": "127.0.0.1:8000",
-
+  "prisma": {
+  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+},
   "scripts": {
     "compile": "tsc && node build/src/index.js",
     "dev": "DEBUG=app:* nodemon",
     "build": "tsc && node build/src/index.js",
     "start": "babel-node -x .ts -- src/index.ts",
-    "seed": "ts-node prisma/seed.ts",
     "test": "vitest --coverage"
   },
   "keywords": [
@@ -61,6 +62,7 @@
     "vitest-mock-extended": "^1.1.3"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@prisma/client": "^4.12.0",
     "@sinclair/typebox": "^0.26.8",
     "@types/debug": "^4.1.7",
@@ -104,4 +106,3 @@
     "zod": "^3.21.4"
   }
 }
-

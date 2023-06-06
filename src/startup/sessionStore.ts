@@ -5,7 +5,12 @@ import session from "express-session"
 import RedisStore from "connect-redis"
 
 export default function (app: Express) {
-    let redisClient = createClient()
+    if (!process.env.REDISCLOUD_URL)
+        throw new Error("There is no Resiscroud URL")
+
+    let redisClient = createClient({
+        socket: { host: process.env.REDISCLOUD_URL },
+    })
     redisClient.connect().catch(console.error)
 
     app.set("trust proxy", 1)
