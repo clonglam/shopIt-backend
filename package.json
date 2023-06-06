@@ -10,8 +10,9 @@
   "scripts": {
     "compile": "tsc && node build/src/index.js",
     "dev": "DEBUG=app:* nodemon",
-    "build": "tsc && node build/src/index.js",
-    "start": "babel-node -x .ts -- src/index.ts",
+  "start": "node build/index.js",
+  "build": "tsc",
+  "postinstall": "npm run build",
     "test": "vitest --coverage"
   },
   "keywords": [
