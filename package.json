@@ -2,7 +2,7 @@
   "name": "shopit-backend",
   "version": "1.0.0",
   "description": "A simple todo backend using Prisma, Express, TypeScript, and PostgreSQL",
-  "main": "build/src/index.js",
+  "main": "build/index.js",
   "proxy": "127.0.0.1:8000",
   "prisma": {
   "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
