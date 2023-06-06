@@ -14,6 +14,7 @@ import {
     updateProduct,
 } from "../service/product.services"
 import { Collection, Product } from "@prisma/client"
+import { pickBy } from "lodash"
 
 export async function createProductHandler(
     req: Request<{}, {}, CreateProductInput["body"]>,
@@ -28,13 +29,18 @@ export async function createProductHandler(
 }
 
 export async function listProductsHandler(
-    req: Request<{}, {}, ListProductsInput["query"]>,
+    req: Request<{}, {}, {}, ListProductsInput["query"]>,
     res: Response
 ) {
     try {
-        // if(req)
-        console.log("req", req.param)
-        const moives = await listProucts(req)
+        const moives = await listProucts({
+            searchText: req.query.searchText,
+            collectionId: Number(req.query.collectionId),
+            pageSize: Number(req.query.pageSize)
+                ? Number(req.query.pageSize)
+                : 10,
+            page: Number(req.query.page) ? Number(req.query.page) : 1,
+        })
         return res.send(moives)
     } catch (err) {
         return res.sendStatus(400)

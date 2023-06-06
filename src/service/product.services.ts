@@ -1,47 +1,29 @@
+import prisma from "../libs/prisma"
 import {
     CreateProductInput,
     DeleteProductInput,
     GetProductInput,
+    ListProductsByCategorySlugInput,
     ListProductsInput,
     UpdateProductInput,
 } from "../schema/product"
-import { PrismaClient } from "@prisma/client"
 import { databaseResponseTimeHistogram } from "../utils/metrics"
 
-const prisma = new PrismaClient()
-
 export async function createProduct(input: CreateProductInput["body"]) {
-    console.log("REqBody", input)
     const { collectionIds, ...rest } = input
+
     const metricsLabels = {
         operation: "Create Product",
     }
 
     const timer = databaseResponseTimeHistogram.startTimer()
-
     try {
-        const collections = await prisma.collection.findMany({
-            where: {
-                id: { in: collectionIds },
-            },
-        })
-
-        if (collections.length !== collectionIds?.length) throw new Error()
-
         const result = await prisma.product.create({
             data: {
                 ...rest,
-                collectionsOnProducts: {
-                    createMany: {
-                        data: collectionIds.map(collectionId => {
-                            return {
-                                collectionId,
-                            }
-                        }),
-                    },
-                },
             },
         })
+
         timer({ ...metricsLabels, success: "true" })
 
         return result
@@ -81,18 +63,74 @@ export async function getProduct({ productId }: GetProductInput["params"]) {
     }
 }
 
-export async function listProucts({}: ListProductsInput) {
+export async function listProucts({
+    searchText,
+    collectionId,
+    pageSize = 10,
+    page = 1,
+}: {
+    searchText?: string
+    collectionId?: number
+    pageSize?: number
+    page?: number
+}) {
     const metricsLabels = {
         operation: "Get Products",
     }
 
+    console.log("pageSize", pageSize)
+    console.log("page", page)
+    console.log("searchText", searchText)
+    console.log("collectionId", collectionId)
     const timer = databaseResponseTimeHistogram.startTimer()
+
+    const conditions = []
+
+    if (searchText !== undefined && searchText !== "") {
+        conditions.push({
+            OR: [
+                {
+                    title: {
+                        contains: searchText.toLowerCase(),
+                    },
+                },
+                {
+                    description: {
+                        contains: searchText.toLowerCase(),
+                    },
+                },
+            ],
+        })
+    }
+
+    // Add category condition if categoryName is not undefined
+    if (collectionId !== undefined && !Number.isNaN(collectionId)) {
+        // const categoryIdsAsNumbers = categoryIds.map(Number)
+
+        conditions.push({
+            collectionsOnProducts: {
+                some: {
+                    collectionId,
+                },
+            },
+        })
+    }
 
     try {
         const result = await prisma.product.findMany({
-            orderBy: {
-                id: "asc",
+            where: {
+                AND: conditions,
             },
+            include: {
+                collectionsOnProducts: {
+                    select: {
+                        collection: true,
+                    },
+                },
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: { createdAt: "desc" },
         })
         timer({ ...metricsLabels, success: "true" })
         return result
@@ -103,16 +141,12 @@ export async function listProucts({}: ListProductsInput) {
 }
 
 export async function listProuctsFilterWithCollection({
-    query,
-}: ListProductsInput) {
-    // console.log("query", query)
-
-    const { collections } = query
-
-    console.log("query", query)
-
+    collectionSlug,
+    pageSize = 10,
+    page = 1,
+}: ListProductsByCategorySlugInput["query"]) {
     const metricsLabels = {
-        operation: "Get Products",
+        operation: "List Products by Collection slug",
     }
 
     const timer = databaseResponseTimeHistogram.startTimer()
@@ -120,25 +154,28 @@ export async function listProuctsFilterWithCollection({
     try {
         const collection = await prisma.collection.findUnique({
             where: {
-                slug: collections,
+                slug: collectionSlug,
             },
             select: {
                 id: true,
             },
         })
 
-        if (collection) {
-            const collectionId = collection.id
-            const result = await prisma.product.findMany({
-                where: {
-                    collectionsOnProducts: {
-                        some: { collectionId: collectionId },
-                    },
+        if (!collection) throw new Error("No Collection Found.")
+
+        const result = await prisma.product.findMany({
+            where: {
+                collectionsOnProducts: {
+                    some: { collectionId: collection.id },
                 },
-            })
-            timer({ ...metricsLabels, success: "true" })
-            return result
-        } else throw new Error("No collection found.")
+            },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: { createdAt: "desc" },
+        })
+
+        timer({ ...metricsLabels, success: "true" })
+        return result
     } catch (e) {
         timer({ ...metricsLabels, success: "false" })
         throw e
@@ -199,9 +236,6 @@ export async function updateProduct(
                             collectionIds?.map(collectionId => {
                                 return {
                                     collectionId: collectionId,
-                                    // collection: {
-                                    //     connect: { id: collectionId },
-                                    // },
                                 }
                             }) || [],
                     },

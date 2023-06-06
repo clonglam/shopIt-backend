@@ -1,8 +1,14 @@
-import { UserRole } from "@prisma/client"
 import { Request, Response, NextFunction } from "express"
 
-export default function (req: Request, res: Response, next: NextFunction) {
-    if (!req?.user?.isAdmin) return res.status(403).send("Access denied.")
+interface AdminMiddleWare extends Request {
+    user?: { role: "ADMIN" | "USER" }
+}
+
+async function admin(req: AdminMiddleWare, res: Response, next: NextFunction) {
+    if (!req.user || req.user.role !== "ADMIN")
+        return res.status(403).send("Access denied.")
 
     next()
 }
+
+export default admin

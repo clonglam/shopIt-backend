@@ -7,13 +7,7 @@ import {
 import { Request, Response } from "express"
 import { Cart } from "@prisma/client"
 import { GetCartInput } from "../schema/cart"
-import {
-    createCart,
-    deleteCart,
-    getCartById,
-    getCartByUserId,
-    updateCart,
-} from "../service/cart.services"
+import { createCart, deleteCart, getCartById } from "../service/cart.services"
 
 export async function createCartHandler(
     req: Request<{}, {}, CreateCartInput["body"]>,
@@ -28,18 +22,6 @@ export async function createCartHandler(
         })
     }
 }
-
-// export async function getCartsHandler(
-//     req: Request<{}, {}, GetCartsInput["query"]>,
-//     res: Response
-// ) {
-//     try {
-//         const carts = await listCarts(req)
-//         return res.send(carts)
-//     } catch (err) {
-//         return res.sendStatus(400)
-//     }
-// }
 
 export default class CartController {
     public async getCart() {
@@ -64,8 +46,8 @@ export async function updateCartHandler(
     res: Response<Cart>
 ) {
     try {
-        const cart = await updateCart(req.params, req.body)
-        return res.send(cart)
+        // const cart = await updateCart(req.params, req.body)
+        // return res.send(cart)
     } catch (err) {
         return res.sendStatus(400)
     }
@@ -88,8 +70,8 @@ export async function getCartByUserIdHandler(
     res: Response
 ) {
     try {
-        const carts = await getCartByUserId({ userId: params.userId })
-        return res.send(carts)
+        // const carts = await getCartByUserId({ userId: params.userId })
+        // return res.send(carts)
     } catch (err) {
         return res.sendStatus(400)
     }

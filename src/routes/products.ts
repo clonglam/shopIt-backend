@@ -15,12 +15,14 @@ import {
     updateProductHandler,
 } from "../controller/product.controller"
 import validateResource from "../middleware/validateResource"
+import auth from "../middleware/auth"
+import admin from "../middleware/admin"
 
 const router = express.Router()
 
 router.get("/:productId", getProductHandler)
 
-router.get("/", validateResource(listProductsSchema), listProductsHandler)
+router.get("/", [validateResource(listProductsSchema)], listProductsHandler)
 
 router.post("/", validateResource(createProductSchema), createProductHandler)
 

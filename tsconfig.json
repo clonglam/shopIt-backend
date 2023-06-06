@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "es6",
     "outDir": "./build",
     "strict": true,
     "esModuleInterop": true,
-    "module": "ESNext", // "module": "CommonJS" should work too
+    "module": "CommonJS", // "module": "CommonJS" should work too
     "moduleResolution": "Node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "resolveJsonModule":true,
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+    "forceConsistentCasingInFileNames": true
+
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"],

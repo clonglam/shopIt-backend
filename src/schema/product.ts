@@ -37,8 +37,10 @@ const params = {
 
 const query = {
     query: z.object({
-        page: z.optional(z.number({})),
-        collections: z.string().optional(),
+        searchText: z.string().optional(),
+        collectionId: z.string().optional(),
+        page: z.string().optional(),
+        pageSize: z.string().optional(),
     }),
 }
 
@@ -48,6 +50,14 @@ export const getProductSchema = z.object({
 
 export const listProductsSchema = z.object({
     ...query,
+})
+
+export const listProductsByCategorySlugSchema = z.object({
+    query: z.object({
+        collectionSlug: z.string().optional(),
+        page: z.number().optional(),
+        pageSize: z.number().optional(),
+    }),
 })
 
 export const createProductSchema = z.object({
@@ -68,3 +78,6 @@ export type ListProductsInput = z.TypeOf<typeof listProductsSchema>
 export type CreateProductInput = z.TypeOf<typeof createProductSchema>
 export type UpdateProductInput = z.TypeOf<typeof updateProductSchema>
 export type DeleteProductInput = z.TypeOf<typeof deleteProductSchema>
+export type ListProductsByCategorySlugInput = z.TypeOf<
+    typeof listProductsByCategorySlugSchema
+>

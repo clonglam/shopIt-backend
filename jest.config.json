@@ -1,5 +1,7 @@
 {
   "preset": "ts-jest",
+  "clearMocks": true,
+  "setupFilesAfterEnv": ["<rootDir>/singleton.ts"],
   "transform": {
     "^.+\\.(ts|tsx)?$": "ts-jest",
     "^.+\\.(js|jsx)$": "babel-jest"

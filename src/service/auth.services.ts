@@ -1,9 +1,10 @@
-import { databaseResponseTimeHistogram } from "../utils/metrics"
-import { PrismaClient, User } from "@prisma/client"
-import session from "express-session"
-import passport from "passport"
-import { Strategy } from "passport-local"
+import { Prisma, PrismaClient, User } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
+import { reponsesFail, ResponseType } from "../utils/response"
+import { databaseResponseTimeHistogram } from "../utils/metrics"
+import { createUser, getUserByEmail } from "./user.services"
+import { pick } from "lodash"
 const prisma = new PrismaClient()
 
 export async function authUser(email: string, password: string) {
@@ -14,68 +15,81 @@ export async function authUser(email: string, password: string) {
     const timer = databaseResponseTimeHistogram.startTimer()
 
     try {
-        // passport.use(
-        //     new Strategy(function (email, password, done) {
-        //         prisma.user
-        //             .findUnique({ where: { email: email } })
-        //             .then(function (user) {
-        //                 if (!user)
-        //                     return done(null, false, {
-        //                         message: "Incorrect username or password.",
-        //                     })
-
-        //                 bcrypt.compare(
-        //                     password,
-        //                     user.password,
-        //                     function (err, res) {
-        //                         if (res) {
-        //                             return done(null, user)
-        //                         } else {
-        //                             return done(null, false, {
-        //                                 message:
-        //                                     "Incorrect username or password.",
-        //                             })
-        //                         }
-        //                     }
-        //                 )
-        //             })
-        //             .catch(function (err) {
-        //                 return done(err)
-        //             })
-        //     })
-        // )
-
-        // passport.serializeUser(function (user: any, done) {
-        //     done(null, user.id)
-        // })
-
-        // passport.deserializeUser(function (id: number, done) {
-        //     prisma.user
-        //         .findUnique({ where: { id: id } })
-        //         .then(function (user) {
-        //             done(null, user)
-        //         })
-        //         .catch(function (err) {
-        //             done(err)
-        //         })
-        // })
-
-        // const user = await prisma.user.findFirst({
-        //     where: {
-        //         email: input.email,
-        //     },
-        // })
-
-        // if (!user) throw new Error("Invalid email or password.")
-
-        // const result = await prisma.user.create({
-        //     data: input,
-        // })
-
         timer({ ...metricsLabels, success: "true" })
         // return result
     } catch (e) {
         timer({ ...metricsLabels, success: "false" })
         throw e
     }
+}
+
+export async function signup(
+    data: Prisma.UserCreateInput
+): Promise<ResponseType<string>> {
+    const metricsLabels = {
+        operation: "signup User",
+    }
+
+    const timer = databaseResponseTimeHistogram.startTimer()
+
+    try {
+        const hashedPassword = bcrypt.hashSync(data.password, 10)
+
+        const createdUser = await createUser({
+            ...data,
+            password: hashedPassword,
+        })
+
+        if (!createdUser) return reponsesFail(400, "Create User Failed.")
+
+        const token = generateAuthToken(createdUser)
+
+        timer({ ...metricsLabels, success: "true" })
+
+        return { body: token }
+    } catch (e) {
+        timer({ ...metricsLabels, success: "false" })
+
+        return reponsesFail(500, e.message)
+    }
+}
+
+interface LoginResponseData {
+    token: string
+    userId: number
+    role: "ADMIN" | "USER"
+}
+export async function login(
+    email: string,
+    password: string
+): Promise<ResponseType<LoginResponseData>> {
+    try {
+        const user = await getUserByEmail(email)
+        if (!user) return reponsesFail(400, "Invalid email or password.")
+
+        const validPassword = await validatePassword(user, password)
+
+        if (!validPassword)
+            return reponsesFail(400, "Invalid email or password.")
+
+        const token = generateAuthToken(user)
+
+        return { body: { token, userId: user.id, role: user.role } }
+    } catch (err) {
+        return reponsesFail(500, "unexpected Error occurced at function login.")
+    }
+}
+
+export function generateAuthToken(user: User) {
+    const JWT = process.env.JWTPRIVATEKEY
+    if (!JWT) throw new Error("There are no JWTPRIVATEKEY ")
+
+    const data = pick(user, "id", "email", "role", "name")
+    const token = jwt.sign(data, JWT)
+
+    return token
+}
+
+export async function validatePassword(user: User, password: string) {
+    return bcrypt.compareSync(password, user.password)
 }

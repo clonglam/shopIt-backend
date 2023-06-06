@@ -20,16 +20,8 @@ export async function createCart(input: CreateCartInput["body"]) {
 
     try {
         const result = await prisma.cart.create({
-            data: {
-                user: { connect: { id: userId } },
-                items: {
-                    create: items.map(item => ({
-                        product: { connect: { id: item.productId } },
-                        quantity: item.quantity,
-                    })),
-                },
-            },
-            include: { items: true }, // Include the created cart items in the response
+            data: {},
+            // include: { items: true }, // Include the created cart items in the response
         })
         timer({ ...metricsLabels, success: "true" })
         return result
@@ -51,7 +43,6 @@ export async function getCartById({ cartId }: GetCartInput["params"]) {
             where: {
                 id: parseInt(cartId),
             },
-            include: { items: true },
         })
 
         timer({ ...metricsLabels, success: "true" })
@@ -63,62 +54,30 @@ export async function getCartById({ cartId }: GetCartInput["params"]) {
     }
 }
 
-export async function getCartByUserId({ userId }: { userId: string }) {
-    const metricsLabels = {
-        operation: "Get Cart By UserId",
-    }
-
-    const timer = databaseResponseTimeHistogram.startTimer()
-
-    try {
-        const cart = await prisma.cart.findUnique({
-            where: {
-                userId: parseInt(userId),
-            },
-            include: {
-                items: {
-                    include: {
-                        product: true,
-                    },
-                },
-            },
-        })
-
-        timer({ ...metricsLabels, success: "true" })
-
-        return cart
-    } catch (e) {
-        timer({ ...metricsLabels, success: "false" })
-        throw e
-    }
-}
-
-// export async function listProucts({ query }: ListCartsInput) {
-//     console.log("query", query)
-
-//     const { collections } = query
-
+// export async function getCartByUserId({ userId }: { userId: string }) {
 //     const metricsLabels = {
-//         operation: "Get Carts",
+//         operation: "Get Cart By UserId",
 //     }
 
 //     const timer = databaseResponseTimeHistogram.startTimer()
 
 //     try {
-//         const result = await prisma.cart.findMany({
+//         const cart = await prisma.cart.findUnique({
 //             where: {
-//                 collections: {
-//                     some: {
-//                         slug: {
-//                             equals: collections,
-//                         },
+//                 userId: parseInt(userId),
+//             },
+//             include: {
+//                 items: {
+//                     include: {
+//                         product: true,
 //                     },
 //                 },
 //             },
-//             include: { collections: true, inventory: true },
 //         })
+
 //         timer({ ...metricsLabels, success: "true" })
-//         return result
+
+//         return cart
 //     } catch (e) {
 //         timer({ ...metricsLabels, success: "false" })
 //         throw e
@@ -151,50 +110,50 @@ export async function deleteCart({ cartId }: DeleteCartInput["params"]) {
     }
 }
 
-export async function updateCart(
-    { cartId }: UpdateCartInput["params"],
-    body: UpdateCartInput["body"]
-) {
-    const id = parseInt(cartId)
-    const { userId, items } = body
+// export async function updateCart(
+//     { cartId }: UpdateCartInput["params"],
+//     body: UpdateCartInput["body"]
+// ) {
+//     const id = parseInt(cartId)
+//     const { userId, items } = body
 
-    const metricsLabels = {
-        operation: "Update Cart",
-    }
+//     const metricsLabels = {
+//         operation: "Update Cart",
+//     }
 
-    const timer = databaseResponseTimeHistogram.startTimer()
+//     const timer = databaseResponseTimeHistogram.startTimer()
 
-    try {
-        const result = await prisma.cart.update({
-            where: { id },
-            data: {
-                user: { connect: { id: userId } }, // Connect the cart to the user by their ID
-                items: {
-                    // Update or create the cart items
-                    upsert: items.map(item => ({
-                        where: {
-                            cartId_productId: {
-                                productId: item.productId,
-                                cartId: id,
-                            },
-                        },
-                        create: {
-                            productId: item.productId,
-                            quantity: item.quantity,
-                            cartId: id,
-                        },
-                        update: { quantity: item.quantity },
-                    })),
-                },
-            },
-            include: { items: true }, // Include the updated items in the response
-        })
+//     try {
+//         const result = await prisma.cart.update({
+//             where: { id },
+//             data: {
+//                 user: { connect: { id: userId } }, // Connect the cart to the user by their ID
+//                 items: {
+//                     // Update or create the cart items
+//                     upsert: items.map(item => ({
+//                         where: {
+//                             cartId_productId: {
+//                                 productId: item.productId,
+//                                 cartId: id,
+//                             },
+//                         },
+//                         create: {
+//                             productId: item.productId,
+//                             quantity: item.quantity,
+//                             cartId: id,
+//                         },
+//                         update: { quantity: item.quantity },
+//                     })),
+//                 },
+//             },
+//             include: { items: true }, // Include the updated items in the response
+//         })
 
-        timer({ ...metricsLabels, success: "true" })
+//         timer({ ...metricsLabels, success: "true" })
 
-        return result
-    } catch (e) {
-        timer({ ...metricsLabels, success: "false" })
-        throw e
-    }
-}
+//         return result
+//     } catch (e) {
+//         timer({ ...metricsLabels, success: "false" })
+//         throw e
+//     }
+// }

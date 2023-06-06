@@ -5,8 +5,8 @@ import {
     // ListUsersInput,
     // UpdateUserInput,
 } from "../schema/user"
-
-import { PrismaClient } from "@prisma/client"
+import { ResponseType } from "../utils/response"
+import { PrismaClient, User } from "@prisma/client"
 import { databaseResponseTimeHistogram } from "../utils/metrics"
 
 const prisma = new PrismaClient()
@@ -34,6 +34,23 @@ export async function createUser(input: CreateUserInput["body"]) {
         return result
     } catch (e) {
         timer({ ...metricsLabels, success: "false" })
+        throw e
+    }
+}
+
+export async function getUserByEmail(email: string) {
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                email: email,
+            },
+        })
+
+        return user
+    } catch (e) {
+        // return {
+        //     error: { message: "unexpexcted Error occure at get User By Email" },
+        // }
         throw e
     }
 }
